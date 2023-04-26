@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  client: 
+    image: client
+    build: ./client/
+    stdin_open: true
+    ports:
+      - "3000:3000"
+
+  read:
+    image: create-server
+    build: ./read/
+    ports:
+      - "3001:3000"
+
+  create:
+    image: read-server
+    build: ./create/
+    ports:
+      - "3002:3000"
+
+  update:
+    image: update-server
+    build: ./update/
+    ports:
+      - "3003:3000"
+
+  delete:
+    image: delete-server
+    build: ./delete/
+    ports:
+      - "3004:3000"
+
+
+
+
+    # networks:
+    #   - postgres
+  # postgres:
+  #   image: postgres:14.1-alpine
+  #   restart: always
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=abin
+  #   ports:
+  #     - '5432:5432'
+
+
+networks:
+  client:
+    driver: bridge
