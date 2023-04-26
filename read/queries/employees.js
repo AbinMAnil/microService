@@ -5,3 +5,4 @@ module.exports =  {
     GET_PAGINATED_EMPLOYEE_LIST,
     GET_EMPLOYEE_DETAILS
 }
+

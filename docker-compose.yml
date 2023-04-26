@@ -1,52 +1,89 @@
-version: '3'
+version: '3.8'
 
 services:
+  db:
+    container_name: db
+    image: 'postgres:12'
+    ports:
+      - 5000:5000
+    volumes:
+      - ./pgdata1:/var/lib/postgressql/data
+    environment:
+     POSTGRES_USER: postgres # The PostgreSQL user (useful to connect to the database)
+     POSTGRES_PASSWORD: abin # The PostgreSQL password (useful to connect to the database)
+     POSTGRES_DB: postgres # The PostgreSQL default database (automatically created at first launch)
+     
   client: 
     image: client
     build: ./client/
     stdin_open: true
     ports:
       - "3000:3000"
+    # volumes:
+      #  - postgres-db:/data/postgres
 
   read:
-    image: create-server
+    image: read
     build: ./read/
     ports:
-      - "3001:3000"
+      - "3001:3001"
+    depends_on:
+      - db
+    environment:
+      - PGHOST=db
+      - USER=postgres
+      - PORT=5432
+      - PASSWORD=abin
+      - DATABASE=postgres
 
   create:
-    image: read-server
+    image: create
     build: ./create/
     ports:
-      - "3002:3000"
+      - "3002:3002"
+    depends_on:
+      - db
+    environment:
+      - PGHOST=db
+      - USER=postgres
+      - PORT=5432
+      - PASSWORD=abin
+      - DATABASE=postgres
 
   update:
-    image: update-server
+    image: update
     build: ./update/
     ports:
-      - "3003:3000"
+      - "3003:3003"
+    depends_on:
+      - db
+    environment:
+      - PGHOST=db
+      - USER=postgres
+      - PORT=5432
+      - PASSWORD=abin
+      - DATABASE=postgres
 
   delete:
-    image: delete-server
+    image: delete
     build: ./delete/
     ports:
-      - "3004:3000"
+      - "3004:3004"
+    depends_on:
+      - db
+    environment:
+      - PGHOST=db
+      - USER=postgres
+      - PORT=5432
+      - PASSWORD=abin
+      - DATABASE=postgres
+      
 
+volumes:
+  pgdata1: {}
 
-
-
-    # networks:
-    #   - postgres
-  # postgres:
-  #   image: postgres:14.1-alpine
-  #   restart: always
-  #   environment:
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=abin
-  #   ports:
-  #     - '5432:5432'
-
-
-networks:
-  client:
-    driver: bridge
+# networks:
+#   # postgres:
+#   #   driver: bridge
+#   client:
+#     driver: bridge

@@ -10,14 +10,17 @@ const {setupProxies} = require("./proxy");
 // setupProxies(app, ROUTES);
 
  app.use(morgan("combined"))
-app.use(
-  cors({
-    origin : "*",
-    // origin: "http://localhost:3000",
-    methods: ["POST", "PUT", "PATCH", , "DELETE", "GET", "OPTIONS", "HEAD"],
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     // origin : "*",
+//     origin: "http://localhost:3000",
+//     methods: ["POST", "PUT", "PATCH", , "DELETE", "GET", "OPTIONS", "HEAD"],
+//     credentials: true,
+//   })
+// );
+
+app.use(cors());
+app.options('*', cors());
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: false }));

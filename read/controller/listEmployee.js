@@ -2,13 +2,13 @@ const pool = require("../db/postgresConnection");
 const { GET_PAGINATED_EMPLOYEE_LIST, GET_EMPLOYEE_DETAILS } = require("../queries/employees");
 
 const listAllEmployees = (req, res, next) => {
-  console.log("data finding")
   const { page, size = 10 } = req?.query;
+
   pool.query(
     GET_PAGINATED_EMPLOYEE_LIST,
     [ parseInt(page) * size || 0 , size],
     (error, result) => {
-      if (error) throw error;
+      if (error) res.status(500).json({message :"something went wrong"})
       else
         res.status(200).json({
           data: (result?.rows || []).map((item) => {
@@ -27,7 +27,7 @@ const getEmployDetails = (req, res, next) => {
     GET_EMPLOYEE_DETAILS , [req?.params?.id],
     (error, result) => {
 
-      if (error) throw error;
+      if (error) res.status(500).json({message :"something went wrong"})
       else res.status(200).json(result?.rows?.[0]);
     }
   );

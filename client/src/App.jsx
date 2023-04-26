@@ -3,13 +3,17 @@ import { BiUserPlus } from "react-icons/bi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Table from "./components/table";
+import DetailsCard from "./components/detailsCard";
+
 import Modal from "./components/modal";
 import Form from "./components/form";
 import Axios from "./services/axios";
-import { PAGE_SIZE, TABLE_HEADERS } from "./constants";
+import { DELETE_BASE_URL, PAGE_SIZE, READ_BASE_URL, TABLE_HEADERS, UPDATE_BASE_URL } from "./constants";
 import moment from "moment";
 import { AiOutlineDeleteRow } from "react-icons/ai";
 import "./App.css";
+import { convertData } from "./utils";
+import axios from "axios";
 
 const App = () => {
   const [allEmployees, setAllEmployees] = useState([]);
@@ -20,12 +24,15 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [upsertLoading, setUpsertLoading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [viewEmployee , setViewEmployee] = useState(null);
+  const [viewEmployee, setViewEmployee] = useState(null);
 
   const listEmployees = async () => {
     setLoading(true);
     try {
-      const data = await Axios.get(`/employees?page=${page}&size=${PAGE_SIZE}`);
+      // const data = await Axios.get(`/employees?page=${page}&size=${PAGE_SIZE}`);
+      const data = await axios.get(
+        `${READ_BASE_URL}/employees?page=${page}&size=${PAGE_SIZE}`
+      );
       setAllEmployees(data?.data?.data);
       setTotalEmployeeCount(+data?.data?.totalCount);
     } catch (e) {
@@ -48,7 +55,8 @@ const App = () => {
       // update
 
       try {
-        const data = await Axios.put("http://localhost:3002/api/v1/employee", {
+        // const data = await Axios.put("http://localhost:3002/api/v1/employee", {
+        const data = await Axios.put(`${UPDATE_BASE_URL}/employee`, {
           ...details,
         });
         onUpsertSuccess(data?.data?.message);
@@ -61,7 +69,8 @@ const App = () => {
     } else {
       //create
       try {
-        const data = await Axios.post("http://localhost:3002/api/v1/employee", {
+        // const data = await Axios.post("http://localhost:3002/api/v1/employee", {
+          const data = await Axios.post( `${UPDATE_BASE_URL}/employee`, {
           ...details,
         });
         onUpsertSuccess(data?.data?.message);
@@ -74,23 +83,10 @@ const App = () => {
     }
   };
 
-  const onEditEmployee = async (e) => {
+  const getEmployData = async (e, callBack) => {
     try {
       const data = await Axios.get(`/employees/${e?.id}`);
-      const employData = data?.data;
-
-      setEmployDetails({
-        firstName: employData?.firstname,
-        lastName: employData?.lastname,
-        joinDate: moment(employData?.joindate).format("YYYY-MM-DD"),
-        birthDate: moment(employData?.birthate).format("YYYY-MM-DD"),
-        dept: employData?.dept,
-        title: employData?.title,
-        salary: employData?.salary,
-        email: employData?.email,
-        id: employData?.id,
-      });
-      setShowModal(true);
+      callBack(data);
     } catch (e) {
       toast.error(e?.response?.data?.message || "Something sent wrong");
       console.log(e);
@@ -101,7 +97,9 @@ const App = () => {
     console.log(e);
     try {
       const data = await Axios.delete(
-        `http://localhost:3002/api/v1/employee/${e?.id}`
+        // `http://localhost:3002/api/v1/employee/${e?.id}`
+        `${DELETE_BASE_URL}/employee/${e?.id}`
+        
       );
       listEmployees();
       toast.success(data?.data?.message);
@@ -113,7 +111,8 @@ const App = () => {
 
   const deleteAllEmployees = async () => {
     try {
-      const data = await Axios.delete(`http://localhost:3002/api/v1/employee`);
+      // const data = await Axios.delete(`http://localhost:3002/api/v1/employee`);
+      const data = await Axios.delete(`${DELETE_BASE_URL}/employee`);
       listEmployees();
       toast.success(data?.data?.message);
     } catch (e) {
@@ -133,31 +132,13 @@ const App = () => {
       <ToastContainer />
 
       <Modal
-        title={viewEmployee?.name}
+        title={`${viewEmployee?.title} ${viewEmployee?.firstName} ${viewEmployee?.lastName}`}
         visible={viewEmployee}
         onClose={() => {
-          setViewEmployee(false);
+          setViewEmployee(null);
         }}
-        content={
-ads
-
-          // <div style={{ padding: "0rem 1rem" }}>
-          //   <p>Do you want to delete all employees</p>
-          //   <div style={{ display: "flex", gap: "1rem" }}>
-          //     <button onClick={deleteAllEmployees} className="button">
-          //       confirm
-          //     </button>
-          //     <button
-          //       onClick={() => setDeleteConfirm(false)}
-          //       className="button"
-          //     >
-          //       cancel
-          //     </button>
-          //   </div>
-          // </div>
-        }
+        content={<DetailsCard data={viewEmployee} />}
       />
-
 
       <Modal
         title={"Are you sure?"}
@@ -211,11 +192,11 @@ ads
               <BiUserPlus style={{ fontSize: "20px" }} /> Add Employee
             </button>
 
-            {allEmployees?.length > 0 &&
+            {allEmployees?.length > 0 && (
               <button onClick={() => setDeleteConfirm(true)}>
-              <AiOutlineDeleteRow style={{ fontSize: "20px" }} /> Delete All
-            </button>
-            }
+                <AiOutlineDeleteRow style={{ fontSize: "20px" }} /> Delete All
+              </button>
+            )}
           </div>
         </div>
         <div className="listBody">
@@ -223,8 +204,17 @@ ads
             <>
               <Table
                 loading={loading}
-                onEdit={(e) => onEditEmployee(e)}
-                onView={(e) => console.log(e)}
+                onEdit={(e) =>
+                  getEmployData(e, (data) => {
+                    setEmployDetails(convertData(data?.data));
+                    setShowModal(true);
+                  })
+                }
+                onView={(e) =>
+                  getEmployData(e, (data) => {
+                    setViewEmployee(convertData(data?.data));
+                  })
+                }
                 onDelete={deleteEmployee}
                 data={allEmployees}
                 columns={TABLE_HEADERS}

@@ -88,3 +88,8 @@ export const FORM_FIELDS = [
 ];
 
 export const PAGE_SIZE = 5;
+
+export const READ_BASE_URL = "http://localhost:3001/api/v1";
+export const CREATE_BASE_URL = "http://localhost:3002/api/v1";
+export const UPDATE_BASE_URL = "http://localhost:3003/api/v1";
+export const DELETE_BASE_URL = "http://localhost:3004/api/v1";
