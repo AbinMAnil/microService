@@ -1,5 +1,12 @@
+const validateEmail = (email) => {
+  return String(email)
+    .toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+};
+
 const verifyEmployee = (req, res, next) => {
-  console.log(req.body);
   const {
     firstName,
     lastName = "",
@@ -24,7 +31,10 @@ const verifyEmployee = (req, res, next) => {
     !id
   ) {
     res.status(500).json({ message: "Please check all fields " });
-  } else next();
+  } else if(validateEmail(email)){
+    res.status(500).json({ message : "Please enter a valid email" });
+  }
+   else next();
 };
 
 module.exports  = {
