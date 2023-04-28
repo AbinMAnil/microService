@@ -8,7 +8,7 @@ import DetailsCard from "./components/detailsCard";
 import Modal from "./components/modal";
 import Form from "./components/form";
 import Axios from "./services/axios";
-import { DELETE_BASE_URL, PAGE_SIZE, READ_BASE_URL, TABLE_HEADERS, UPDATE_BASE_URL } from "./constants";
+import { CREATE_BASE_URL, DELETE_BASE_URL, PAGE_SIZE, READ_BASE_URL, TABLE_HEADERS, UPDATE_BASE_URL } from "./constants";
 import moment from "moment";
 import { AiOutlineDeleteRow } from "react-icons/ai";
 import "./App.css";
@@ -70,7 +70,7 @@ const App = () => {
       //create
       try {
         // const data = await Axios.post("http://localhost:3002/api/v1/employee", {
-          const data = await Axios.post( `${UPDATE_BASE_URL}/employee`, {
+          const data = await Axios.post( `${CREATE_BASE_URL}/employee`, {
           ...details,
         });
         onUpsertSuccess(data?.data?.message);

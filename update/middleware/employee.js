@@ -31,7 +31,7 @@ const verifyEmployee = (req, res, next) => {
     !id
   ) {
     res.status(500).json({ message: "Please check all fields " });
-  } else if(validateEmail(email)){
+  } else if(!validateEmail(email)){
     res.status(500).json({ message : "Please enter a valid email" });
   }
    else next();
